@@ -1,111 +1,56 @@
-import React, { Component } from "react";
-import Form from "react-validation/build/form";
-import  Input from "react-validation/build/input";
-import checkButton from "react-validation/build/button";
+import { Component } from "react";
+import { RouteComponentProps } from "react-router-dom";
+import { Formik, Field, Form, ErrorMessage } from "formik";
+import * as Yup from "yup";
 
 import AuthService from "../services/auth.service";
 
+interface RouterProps {
+  history: string;
+}
 
-const required = value => {
-  if(!value){
-    return (
-      <div className ="alert alert-danger" role="alert">
-      This field is required!
-      </div>
-    );
-  }
+type Props = RouteComponentProps<RouterProps>;
+
+type State = {
+  username: string,
+  password: string,
+  loading: boolean,
+  message: string
 };
 
-
-const email = value => {
-  if(!isEmail(value)){
-    return (
-      <div className ="alert alert-danger" role="alert">
-      This is not a valid email.
-      </div>
-    );
-  }
-};
-
-const vusername = value => {
-  if(value.length < 3 || value.length > 20){
-    return (
-      <div className ="alert alert-danger" role="alert">
-      This username must be between 3 and 20 characters.
-      </div>
-    );
-  }
-};
-const vpassword = value => {
-  if(value.length < 6 || value.length > 40){
-    return (
-      <div className ="alert alert-danger" role="alert">
-      The password must be between 6 and 40 characters.
-      </div>
-    );
-  }
-};
-
-export default class Register extends Component<Props, State> {
+export default class Login extends Component<Props, State> {
   constructor(props: Props) {
     super(props);
-    this.handleRegister = this.handleRegister.bind(this);
+    this.handleLogin = this.handleLogin.bind(this);
 
     this.state = {
       username: "",
-      email: "",
       password: "",
-      successful: false,
+      loading: false,
       message: ""
     };
   }
 
   validationSchema() {
     return Yup.object().shape({
-      username: Yup.string()
-        .test(
-          "len",
-          "The username must be between 3 and 20 characters.",
-          (val: any) =>
-            val &&
-            val.toString().length >= 3 &&
-            val.toString().length <= 20
-        )
-        .required("This field is required!"),
-      email: Yup.string()
-        .email("This is not a valid email.")
-        .required("This field is required!"),
-      password: Yup.string()
-        .test(
-          "len",
-          "The password must be between 6 and 40 characters.",
-          (val: any) =>
-            val &&
-            val.toString().length >= 6 &&
-            val.toString().length <= 40
-        )
-        .required("This field is required!"),
+      username: Yup.string().required("This field is required!"),
+      password: Yup.string().required("This field is required!"),
     });
   }
 
-  handleRegister(formValue: { username: string; email: string; password: string }) {
-    const { username, email, password } = formValue;
+  handleLogin(formValue: { username: string; password: string }) {
+    const { username, password } = formValue;
 
     this.setState({
       message: "",
-      successful: false
+      loading: true
     });
 
-    AuthService.register(
-      username,
-      email,
-      password
-    ).then(
-      response => {
-        this.setState({
-          message: response.data.message,
-          successful: true
-        });
+
+    AuthService.login(username, password).then(
+      () => {
+        this.props.history.push("/profile");
+        window.location.reload();
       },
       error => {
         const resMessage =
@@ -116,7 +61,7 @@ export default class Register extends Component<Props, State> {
           error.toString();
 
         this.setState({
-          successful: false,
+          loading: false,
           message: resMessage
         });
       }
@@ -124,11 +69,10 @@ export default class Register extends Component<Props, State> {
   }
 
   render() {
-    const { successful, message } = this.state;
+    const { loading, message } = this.state;
 
     const initialValues = {
       username: "",
-      email: "",
       password: "",
     };
 
@@ -144,59 +88,41 @@ export default class Register extends Component<Props, State> {
           <Formik
             initialValues={initialValues}
             validationSchema={this.validationSchema}
-            onSubmit={this.handleRegister}
+            onSubmit={this.handleLogin}
           >
             <Form>
-              {!successful && (
-                <div>
-                  <div className="form-group">
-                    <label htmlFor="username"> Username </label>
-                    <Field name="username" type="text" className="form-control" />
-                    <ErrorMessage
-                      name="username"
-                      component="div"
-                      className="alert alert-danger"
-                    />
-                  </div>
+              <div className="form-group">
+                <label htmlFor="username">Username</label>
+                <Field name="username" type="text" className="form-control" />
+                <ErrorMessage
+                  name="username"
+                  component="div"
+                  className="alert alert-danger"
+                />
+              </div>
 
-                  <div className="form-group">
-                    <label htmlFor="email"> Email </label>
-                    <Field name="email" type="email" className="form-control" />
-                    <ErrorMessage
-                      name="email"
-                      component="div"
-                      className="alert alert-danger"
-                    />
-                  </div>
+              <div className="form-group">
+                <label htmlFor="password">Password</label>
+                <Field name="password" type="password" className="form-control" />
+                <ErrorMessage
+                  name="password"
+                  component="div"
+                  className="alert alert-danger"
+                />
+              </div>
 
-                  <div className="form-group">
-                    <label htmlFor="password"> Password </label>
-                    <Field
-                      name="password"
-                      type="password"
-                      className="form-control"
-                    />
-                    <ErrorMessage
-                      name="password"
-                      component="div"
-                      className="alert alert-danger"
-                    />
-                  </div>
-
-                  <div className="form-group">
-                    <button type="submit" className="btn btn-primary btn-block">Sign Up</button>
-                  </div>
-                </div>
-              )}
+              <div className="form-group">
+                <button type="submit" className="btn btn-primary btn-block" disabled={loading}>
+                  {loading && (
+                    <span className="spinner-border spinner-border-sm"></span>
+                  )}
+                  <span>Login</span>
+                </button>
+              </div>
 
               {message && (
                 <div className="form-group">
-                  <div
-                    className={
-                      successful ? "alert alert-success" : "alert alert-danger"
-                    }
-                    role="alert"
-                  >
+                  <div className="alert alert-danger" role="alert">
                     {message}
                   </div>
                 </div>
