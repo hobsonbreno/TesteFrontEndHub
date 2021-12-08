@@ -33,26 +33,26 @@ export default class Register extends Component<Props, State> {
       username: Yup.string()
         .test(
           "len",
-          "The username must be between 3 and 20 characters.",
+          "O nome de usuário deve ter entre 3 e 20 caracteres.",
           (val: any) =>
             val &&
             val.toString().length >= 3 &&
             val.toString().length <= 20
         )
-        .required("This field is required!"),
+        .required("Este campo é obrigatório!"),
       email: Yup.string()
-        .email("This is not a valid email.")
-        .required("This field is required!"),
+        .email("Este não é um email válido.")
+        .required("Este campo é obrigatório!"),
       password: Yup.string()
         .test(
           "len",
-          "The password must be between 6 and 40 characters.",
+          "A senha deve ter entre 6 e 40 caracteres.",
           (val: any) =>
             val &&
             val.toString().length >= 6 &&
             val.toString().length <= 40
         )
-        .required("This field is required!"),
+        .required("Este campo é obrigatório!"),
     });
   }
 
@@ -133,7 +133,7 @@ export default class Register extends Component<Props, State> {
                     <ErrorMessage
                       name="email"
                       component="div"
-                      className="alert alert-danger"
+                      className="alerta alerta-perigo"
                     />
                   </div>
 
@@ -147,7 +147,7 @@ export default class Register extends Component<Props, State> {
                     <ErrorMessage
                       name="password"
                       component="div"
-                      className="alert alert-danger"
+                      className="alerta alerta-perigo"
                     />
                   </div>
 
@@ -161,7 +161,7 @@ export default class Register extends Component<Props, State> {
                 <div className="form-group">
                   <div
                     className={
-                      successful ? "alert alert-success" : "alert alert-danger"
+                      successful ? "alerta alerta-sucesso" : "alerta alerta-perigo"
                     }
                     role="alert"
                   >
