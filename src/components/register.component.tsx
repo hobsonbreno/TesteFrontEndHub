@@ -20,7 +20,7 @@ export default class Register extends Component<Props, State> {
     this.handleRegister = this.handleRegister.bind(this);
 
     this.state = {
-      username: "hobson",
+      username: "",
       email: "",
       password: "",
       successful: false,
