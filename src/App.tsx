@@ -70,7 +70,7 @@ class App extends Component<Props, State> {
       <div>
         <nav className="navbar navbar-expand navbar-dark bg-dark">
           <Link to={"/"} className="navbar-brand">
-            Teste HubLocal - 10/12/21 
+            10-12-2021 - Teste HubLocal - Hobson Nascimento 
           </Link>
           <div className="navbar-nav mr-auto">
             <li className="nav-item">
